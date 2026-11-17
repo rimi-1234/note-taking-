@@ -1,6 +1,6 @@
 # Secure Notes - QA Guide
 
-_Updated after each module. Last updated: 2026-11-18 02:09 (UTC+6)._
+_Updated after each module. Last updated: 2026-11-18 02:15 (UTC+6)._
 
 ## Running the checks
 
@@ -76,6 +76,16 @@ Observed on Atlas `secure-notes` (2026-11-18): indexes exact; counts `{ users: 4
 | 1 | All notes | `GET /api/admin/notes` as admin | Paginated list; owner has `name` + `email` |
 | 2 | Filter | `?owner=<userId>` | Only that user's notes |
 | 3 | Non-admin | Same as regular user | `403 FORBIDDEN` |
+
+### M4 / Admin users
+
+| # | Scenario | Command | Expected |
+| --- | --- | --- | --- |
+| 1 | Create user | `POST /api/admin/users` | `201 { user }` |
+| 2 | Duplicate email | Same email twice | `409 EMAIL_TAKEN` |
+| 3 | Self-delete | Delete own id (with 2+ admins) | `400 CANNOT_MODIFY_SELF` |
+| 4 | Last admin | Demote/delete sole admin | `409 LAST_ADMIN` |
+| 5 | Cascade | Delete user who has notes/posts | `204`; notes and posts gone |
 
 ## Edge-case checklist
 

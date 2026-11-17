@@ -9,6 +9,7 @@ import { AppError, errorHandler, notFoundHandler } from './lib/errors.js';
 import { logger } from './lib/logger.js';
 import { createGlobalLimiter } from './middleware/rate-limit.js';
 import { createAdminNotesRouter } from './routes/admin-notes.routes.js';
+import { createAdminUsersRouter } from './routes/admin-users.routes.js';
 import { createAuthRouter } from './routes/auth.routes.js';
 import { createMeRouter } from './routes/me.routes.js';
 import { createNotesRouter } from './routes/notes.routes.js';
@@ -47,6 +48,7 @@ export function createApp() {
   app.use('/api/users', createMeRouter());
   app.use('/api/notes', createNotesRouter());
   app.use('/api/admin/notes', createAdminNotesRouter());
+  app.use('/api/admin/users', createAdminUsersRouter());
 
   app.use(notFoundHandler);
   app.use(errorHandler);

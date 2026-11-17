@@ -1,6 +1,6 @@
 # Secure Notes - Feature Spec
 
-_Living document. Only updated when a module passes verification. Last updated: 2026-11-18 02:09 (UTC+6)._
+_Living document. Only updated when a module passes verification. Last updated: 2026-11-18 02:15 (UTC+6)._
 
 ## Overview
 
@@ -38,6 +38,7 @@ flowchart LR
 | [M2 / RBAC and profile](./milestone-2-auth/module-2-rbac-and-profile/overview.md) | 2026-11-18 | `authenticate`, `requireRole`, `GET/PATCH /api/users/me`, password change revokes sessions |
 | [M3 / Notes CRUD](./milestone-3-notes/module-1-notes-crud/overview.md) | 2026-11-18 | Own notes CRUD + pagination; writes owner-scoped; admin GET any, cannot mutate others |
 | [M3 / Admin notes](./milestone-3-notes/module-2-admin-notes/overview.md) | 2026-11-18 | `GET /api/admin/notes` with optional `?owner=`, populate name/email, no new index |
+| [M4 / Admin users](./milestone-4-user-management/module-1-admin-users/overview.md) | 2026-11-18 | Admin user CRUD, self/last-admin guards, cascade notes+posts, tokenVersion on role/password |
 
 ## Current API surface
 
