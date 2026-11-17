@@ -7,6 +7,8 @@ import { pinoHttp } from 'pino-http';
 import { env } from './config/env.js';
 import { AppError, errorHandler, notFoundHandler } from './lib/errors.js';
 import { logger } from './lib/logger.js';
+import { createGlobalLimiter } from './middleware/rate-limit.js';
+import { createAuthRouter } from './routes/auth.routes.js';
 
 export function createApp() {
   const app = express();
@@ -31,11 +33,14 @@ export function createApp() {
   app.use(express.json({ limit: '100kb' }));
   app.use(cookieParser());
   app.use(pinoHttp({ logger, autoLogging: { ignore: (req) => req.url === '/health' } }));
+  app.use(createGlobalLimiter());
 
   app.get('/health', (_req, res) => {
     const dbUp = mongoose.connection.readyState === 1;
     res.status(dbUp ? 200 : 503).json({ status: dbUp ? 'ok' : 'degraded', db: dbUp ? 'up' : 'down' });
   });
+
+  app.use('/api/auth', createAuthRouter());
 
   app.use(notFoundHandler);
   app.use(errorHandler);

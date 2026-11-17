@@ -1,6 +1,6 @@
 # Secure Notes - QA Guide
 
-_Updated after each module. Last updated: 2026-11-18 01:30 (UTC+6)._
+_Updated after each module. Last updated: 2026-11-18 01:50 (UTC+6)._
 
 ## Running the checks
 
@@ -41,6 +41,16 @@ Observed output on 2026-11-18: all six matched the expected results.
 
 Observed on Atlas `secure-notes` (2026-11-18): indexes exact; counts `{ users: 4, notes: 4, posts: 4 }`.
 
+### M2 / Auth core
+
+| # | Scenario | Command | Expected |
+| --- | --- | --- | --- |
+| 1 | Login | `POST /api/auth/login` with admin email/password | `200` + `accessToken` + `Set-Cookie: refreshToken` |
+| 2 | Bad password | Same with wrong password | `401 INVALID_CREDENTIALS` "Invalid credentials" |
+| 3 | Refresh | `POST /api/auth/refresh` with cookie + `X-Requested-With` | `200` + new access token + rotated cookie |
+| 4 | CSRF missing | Refresh without `X-Requested-With` | `403 CSRF_REJECTED` |
+| 5 | Logout then refresh | Logout, then refresh with old cookie | Logout `204`; refresh `401 UNAUTHENTICATED` |
+
 ## Edge-case checklist
 
 - [x] Internal errors return a generic 500 and never leak the message (automated test)
@@ -48,4 +58,8 @@ Observed on Atlas `secure-notes` (2026-11-18): indexes exact; counts `{ users: 4
 - [x] Duplicate email hits unique index (`11000`)
 - [x] Interests are lowercased, trimmed, and de-duplicated
 - [x] `passwordHash` is omitted from default queries and `toJSON`
+- [x] Wrong email and wrong password share the same `INVALID_CREDENTIALS` message
+- [x] Refresh/logout require `X-Requested-With`
+- [x] Logout bumps `tokenVersion` and invalidates the refresh cookie
+- [x] Login rate limit returns `429 RATE_LIMITED`
 - [x] Startup refuses identical access and refresh secrets

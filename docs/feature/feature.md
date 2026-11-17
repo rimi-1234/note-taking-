@@ -1,6 +1,6 @@
 # Secure Notes - Feature Spec
 
-_Living document. Only updated when a module passes verification. Last updated: 2026-11-18 01:30 (UTC+6)._
+_Living document. Only updated when a module passes verification. Last updated: 2026-11-18 01:50 (UTC+6)._
 
 ## Overview
 
@@ -34,6 +34,7 @@ flowchart LR
 | --- | --- | --- |
 | [M1 / Project setup](./milestone-1-foundation/module-1-project-setup/overview.md) | 2026-11-18 | Express 5 + TS app shell, zod env validation, pino logging with redaction, unified error format, helmet, CORS allow-list, `/health`, test harness |
 | [M1 / Data models](./milestone-1-foundation/module-2-data-models/overview.md) | 2026-11-18 | User / Note / Post schemas, exactly 4 custom indexes via `schema.index()`, sync-indexes + admin/demo seeds |
+| [M2 / Auth core](./milestone-2-auth/module-1-auth-core/overview.md) | 2026-11-18 | Login / refresh / logout, JWT + httpOnly cookie, tokenVersion revoke, CSRF header, rate limits |
 
 ## Current API surface
 
