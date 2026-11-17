@@ -1,19 +1,19 @@
 # Overview - Notes CRUD
 
-> **Status: planned.** This file is rewritten with the real details when the module passes verification.
+> **Status: done and verified** (2026-11-18). This describes what was actually built.
 
 ## In short
 
-Adds the shared pagination helper and the five note endpoints. Every write is scoped to the owner in the query itself, so a user (or admin) touching someone else's note simply gets 404.
+Shared pagination (`page`/`limit`, cap 100) plus five note endpoints. Lists and counts use `{ owner }` with `owner_1__id_-1`. Writes always include `owner: me` in the filter so another user's note (or an admin editing someone else's) returns `404` without leaking existence. Admins may `GET` any note by `_id`.
 
-## What changes
+## What changed
 
 | File | Change |
 | --- | --- |
-| `src/lib/pagination.ts` | New |
-| `src/routes/notes.routes.ts` | New |
-| `src/app.ts` | Mount `/api/notes` |
-| `tests/notes.test.ts` | New |
+| `src/lib/pagination.ts` | Query schema + `{ data, page, limit, total, totalPages }` |
+| `src/routes/notes.routes.ts` | CRUD under `/api/notes` |
+| `src/app.ts` | Mount notes router |
+| `tests/notes.test.ts` | Owner scope, admin read-only, pagination, validation |
 
 ## How it works
 
@@ -35,9 +35,9 @@ sequenceDiagram
     B->>API: PATCH /api/notes/:id
     API->>DB: findOneAndUpdate({_id, owner: me})
     DB-->>API: null when not mine
-    API-->>B: 404 NOT_FOUND (never reveals the note exists)
+    API-->>B: 404 NOT_FOUND
 ```
 
 ## Where it fits
 
-Part of [Milestone 3 - Notes](../overview.md).
+Part of [Milestone 3 - Notes](../overview.md). Next: [Admin notes list](../module-2-admin-notes/overview.md).

@@ -1,6 +1,6 @@
 # Secure Notes - Feature Spec
 
-_Living document. Only updated when a module passes verification. Last updated: 2026-11-18 02:00 (UTC+6)._
+_Living document. Only updated when a module passes verification. Last updated: 2026-11-18 02:07 (UTC+6)._
 
 ## Overview
 
@@ -36,6 +36,7 @@ flowchart LR
 | [M1 / Data models](./milestone-1-foundation/module-2-data-models/overview.md) | 2026-11-18 | User / Note / Post schemas, exactly 4 custom indexes via `schema.index()`, sync-indexes + admin/demo seeds |
 | [M2 / Auth core](./milestone-2-auth/module-1-auth-core/overview.md) | 2026-11-18 | Login / refresh / logout, JWT + httpOnly cookie, tokenVersion revoke, CSRF header, rate limits |
 | [M2 / RBAC and profile](./milestone-2-auth/module-2-rbac-and-profile/overview.md) | 2026-11-18 | `authenticate`, `requireRole`, `GET/PATCH /api/users/me`, password change revokes sessions |
+| [M3 / Notes CRUD](./milestone-3-notes/module-1-notes-crud/overview.md) | 2026-11-18 | Own notes CRUD + pagination; writes owner-scoped; admin GET any, cannot mutate others |
 
 ## Current API surface
 
