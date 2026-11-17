@@ -1,6 +1,6 @@
 # Secure Notes - QA Guide
 
-_Updated after each module. Last updated: 2026-11-18 02:07 (UTC+6)._
+_Updated after each module. Last updated: 2026-11-18 02:09 (UTC+6)._
 
 ## Running the checks
 
@@ -68,6 +68,14 @@ Observed on Atlas `secure-notes` (2026-11-18): indexes exact; counts `{ users: 4
 | 2 | List mine | `GET /api/notes?page=1&limit=20` | `{ data, page, limit, total, totalPages }` |
 | 3 | Other user's note | `GET/PATCH/DELETE` their id as another user | `404 NOT_FOUND` |
 | 4 | Admin read vs write | Admin `GET` ok; admin `PATCH/DELETE` another's note | GET `200`; mutate `404` |
+
+### M3 / Admin notes
+
+| # | Scenario | Command | Expected |
+| --- | --- | --- | --- |
+| 1 | All notes | `GET /api/admin/notes` as admin | Paginated list; owner has `name` + `email` |
+| 2 | Filter | `?owner=<userId>` | Only that user's notes |
+| 3 | Non-admin | Same as regular user | `403 FORBIDDEN` |
 
 ## Edge-case checklist
 
