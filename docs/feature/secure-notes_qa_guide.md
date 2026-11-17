@@ -1,6 +1,6 @@
 # Secure Notes - QA Guide
 
-_Updated after each module. Last updated: 2026-11-18 01:50 (UTC+6)._
+_Updated after each module. Last updated: 2026-11-18 02:00 (UTC+6)._
 
 ## Running the checks
 
@@ -50,6 +50,15 @@ Observed on Atlas `secure-notes` (2026-11-18): indexes exact; counts `{ users: 4
 | 3 | Refresh | `POST /api/auth/refresh` with cookie + `X-Requested-With` | `200` + new access token + rotated cookie |
 | 4 | CSRF missing | Refresh without `X-Requested-With` | `403 CSRF_REJECTED` |
 | 5 | Logout then refresh | Logout, then refresh with old cookie | Logout `204`; refresh `401 UNAUTHENTICATED` |
+
+### M2 / RBAC and profile
+
+| # | Scenario | Command | Expected |
+| --- | --- | --- | --- |
+| 1 | Profile | `GET /api/users/me` with Bearer | `200 { user }` |
+| 2 | No token | Same without Authorization | `401 UNAUTHENTICATED` |
+| 3 | Update profile | `PATCH /api/users/me` `{ name, interests }` | `200` with updated fields (interests lowercased) |
+| 4 | Change password | `PATCH` with `currentPassword` + `newPassword` | `200`; old access token then `401`; must log in again |
 
 ## Edge-case checklist
 

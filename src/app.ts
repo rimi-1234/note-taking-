@@ -9,6 +9,7 @@ import { AppError, errorHandler, notFoundHandler } from './lib/errors.js';
 import { logger } from './lib/logger.js';
 import { createGlobalLimiter } from './middleware/rate-limit.js';
 import { createAuthRouter } from './routes/auth.routes.js';
+import { createMeRouter } from './routes/me.routes.js';
 
 export function createApp() {
   const app = express();
@@ -41,6 +42,7 @@ export function createApp() {
   });
 
   app.use('/api/auth', createAuthRouter());
+  app.use('/api/users', createMeRouter());
 
   app.use(notFoundHandler);
   app.use(errorHandler);
