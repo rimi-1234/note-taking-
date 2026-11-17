@@ -1,6 +1,6 @@
 # Secure Notes - Feature Spec
 
-_Living document. Only updated when a module passes verification. Last updated: 2026-11-18 02:36 (UTC+6)._
+_Living document. Only updated when a module passes verification. Last updated: 2026-11-18 03:25 (UTC+6)._
 
 ## Overview
 
@@ -42,6 +42,7 @@ flowchart LR
 | [M5 / Posts $lookup](./milestone-5-posts-and-aggregations/module-1-posts-lookup/overview.md) | 2026-11-18 | Create/delete posts; `GET /users/:id/posts` with `$lookup` + facet pagination |
 | [M5 / Interests agg](./milestone-5-posts-and-aggregations/module-2-interests-aggregation/overview.md) | 2026-11-18 | Admin `GET /users/by-interest` single aggregate on `interests_1` |
 | [M5 / Explain](./milestone-5-posts-and-aggregations/module-3-index-verification/overview.md) | 2026-11-18 | `npm run explain` — no COLLSCAN; exact index inventory |
+| [M6 / Frontend](./milestone-6-frontend/overview.md) | 2026-11-18 | Next.js App Router client: login, notes, profile, posts, admin users/notes/interests |
 
 ## Current API surface
 

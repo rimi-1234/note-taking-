@@ -1,5 +1,5 @@
 # Progress - Frontend admin pages
 
-- **Status:** not-started
-- **Last updated:** 2026-11-18 00:50 (UTC+6)
+- **Status:** done
+- **Last updated:** 2026-11-18 03:25 (UTC+6)
 - **Blockers:** none

@@ -1,12 +1,23 @@
 # Secure Notes - Frontend Guide
 
-_Updated after each module. Last updated: 2026-11-18 01:05 (UTC+6)._
+_Updated after each module. Last updated: 2026-11-18 03:25 (UTC+6)._
 
 ## Stack
 
-Next.js (App Router) + TypeScript, written by hand. All pages are client components. One plain CSS file.
+Next.js 15 (App Router) + TypeScript, written by hand. All pages are client components. One plain CSS file (`src/app/globals.css`).
 
-## Planned component tree
+## Run
+
+```bash
+cd frontend
+cp .env.example .env.local
+npm install
+npm run dev
+```
+
+`NEXT_PUBLIC_API_URL` must point at the API including `/api` (local default `http://localhost:4000/api`). Backend `CORS_ORIGINS` must include `http://localhost:3000`.
+
+## Component tree
 
 ```mermaid
 flowchart TD
@@ -21,25 +32,24 @@ flowchart TD
 
 ## Auth and state
 
-- The access token lives in memory inside `AuthProvider`; on page load the app calls `POST /auth/refresh` to restore the session from the httpOnly cookie.
-- Every request goes through `src/lib/api.ts`, which sends `credentials: 'include'`, the Bearer token and `X-Requested-With: XMLHttpRequest`, and on a 401 refreshes once and retries.
+- Access token lives in memory inside `AuthProvider` (ref-backed so refresh retries see it immediately).
+- On load: `POST /auth/refresh` restores the session from the httpOnly cookie.
+- `src/lib/api.ts` sends `credentials: 'include'`, Bearer token, and `X-Requested-With: XMLHttpRequest`.
+- Concurrent 401s share one refresh (single-flight), then retry once.
 
-## Backend contracts available to the frontend
-
-### Error shape (every endpoint)
+## Error shape
 
 ```ts
 type ApiError = { error: { code: string; message: string; details?: unknown } };
 ```
 
-Show `error.message` to the user. Branch on `error.code` where the UI needs to react (for example `UNAUTHENTICATED` triggers a refresh, and `EMAIL_TAKEN` highlights the email field).
+Show `error.message`. Branch on `error.code` when needed (`EMAIL_TAKEN`, `CANNOT_MODIFY_SELF`, `LAST_ADMIN`, …).
 
-### CORS
+## Manual smoke checklist
 
-- The backend only accepts browser requests from origins listed in `CORS_ORIGINS` (locally `http://localhost:3000`, the Next.js dev server).
-- Credentials are allowed, so the frontend must use `credentials: 'include'` for the refresh cookie to be sent.
-- Allowed request headers: `Content-Type`, `Authorization`, `X-Requested-With`.
-
-### Health
-
-`GET {API_ORIGIN}/health` returns `{ status, db }`. Note that it's outside `/api`.
+1. Log in as admin → reload keeps session.
+2. Create / edit / delete a note.
+3. Update profile interests; change password → redirected to login.
+4. Publish and delete own posts on `/users/<me>/posts`.
+5. Admin: create user, filter notes by owner, open interests groups.
+6. Log in as regular user → `/admin/*` redirects to `/notes`.
