@@ -1,6 +1,6 @@
 # Overview - Milestone 1 - Foundation
 
-> **Status: planned.** Updated as each module passes verification.
+> **Status: in progress.** Module 1 and 2 verified.
 
 ## Goal
 

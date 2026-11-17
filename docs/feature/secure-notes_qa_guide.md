@@ -1,6 +1,6 @@
 # Secure Notes - QA Guide
 
-_Updated after each module. Last updated: 2026-11-18 01:05 (UTC+6)._
+_Updated after each module. Last updated: 2026-11-18 01:30 (UTC+6)._
 
 ## Running the checks
 
@@ -30,8 +30,22 @@ npm run dev              # API on http://localhost:4000
 
 Observed output on 2026-11-18: all six matched the expected results.
 
+### M1 / Data models
+
+| # | Scenario | Command | Expected |
+| --- | --- | --- | --- |
+| 1 | Sync indexes | `npm run sync-indexes` | Logs User/Note/Post synced |
+| 2 | Seed admin | `npm run seed` | Upserts `ADMIN_EMAIL` as role `admin` |
+| 3 | Seed demo | `npm run seed:demo` | 3 users, 4 notes, 4 posts (safe to rerun) |
+| 4 | Index set on Atlas | Inspect collections in Atlas or script | users: `_id_`, `email_1` unique, `interests_1`; notes: `_id_`, `owner_1__id_-1`; posts: `_id_`, `author_1__id_-1` |
+
+Observed on Atlas `secure-notes` (2026-11-18): indexes exact; counts `{ users: 4, notes: 4, posts: 4 }`.
+
 ## Edge-case checklist
 
 - [x] Internal errors return a generic 500 and never leak the message (automated test)
 - [ ] Body larger than 100 KB returns 413 `PAYLOAD_TOO_LARGE` (mapped in the error handler, not exercised yet; will be covered once there's a POST route in auth)
+- [x] Duplicate email hits unique index (`11000`)
+- [x] Interests are lowercased, trimmed, and de-duplicated
+- [x] `passwordHash` is omitted from default queries and `toJSON`
 - [x] Startup refuses identical access and refresh secrets
