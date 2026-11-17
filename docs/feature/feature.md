@@ -1,6 +1,6 @@
 # Secure Notes - Feature Spec
 
-_Living document. Only updated when a module passes verification. Last updated: 2026-11-18 02:15 (UTC+6)._
+_Living document. Only updated when a module passes verification. Last updated: 2026-11-18 02:36 (UTC+6)._
 
 ## Overview
 
@@ -39,6 +39,9 @@ flowchart LR
 | [M3 / Notes CRUD](./milestone-3-notes/module-1-notes-crud/overview.md) | 2026-11-18 | Own notes CRUD + pagination; writes owner-scoped; admin GET any, cannot mutate others |
 | [M3 / Admin notes](./milestone-3-notes/module-2-admin-notes/overview.md) | 2026-11-18 | `GET /api/admin/notes` with optional `?owner=`, populate name/email, no new index |
 | [M4 / Admin users](./milestone-4-user-management/module-1-admin-users/overview.md) | 2026-11-18 | Admin user CRUD, self/last-admin guards, cascade notes+posts, tokenVersion on role/password |
+| [M5 / Posts $lookup](./milestone-5-posts-and-aggregations/module-1-posts-lookup/overview.md) | 2026-11-18 | Create/delete posts; `GET /users/:id/posts` with `$lookup` + facet pagination |
+| [M5 / Interests agg](./milestone-5-posts-and-aggregations/module-2-interests-aggregation/overview.md) | 2026-11-18 | Admin `GET /users/by-interest` single aggregate on `interests_1` |
+| [M5 / Explain](./milestone-5-posts-and-aggregations/module-3-index-verification/overview.md) | 2026-11-18 | `npm run explain` — no COLLSCAN; exact index inventory |
 
 ## Current API surface
 

@@ -1,6 +1,6 @@
 # Secure Notes - QA Guide
 
-_Updated after each module. Last updated: 2026-11-18 02:15 (UTC+6)._
+_Updated after each module. Last updated: 2026-11-18 02:36 (UTC+6)._
 
 ## Running the checks
 
@@ -86,6 +86,15 @@ Observed on Atlas `secure-notes` (2026-11-18): indexes exact; counts `{ users: 4
 | 3 | Self-delete | Delete own id (with 2+ admins) | `400 CANNOT_MODIFY_SELF` |
 | 4 | Last admin | Demote/delete sole admin | `409 LAST_ADMIN` |
 | 5 | Cascade | Delete user who has notes/posts | `204`; notes and posts gone |
+
+### M5 / Posts and aggregations
+
+| # | Scenario | Command | Expected |
+| --- | --- | --- | --- |
+| 1 | User posts | `GET /api/users/:id/posts` | `{ user, data, page, limit, total, totalPages }` newest first |
+| 2 | Create/delete post | `POST /api/posts`, `DELETE /api/posts/:id` | Create `201`; other author's delete `404` |
+| 3 | Interests | `GET /api/users/by-interest` as admin | Groups with counts; empty-interest users excluded |
+| 4 | Explain | `npm run explain` | PASS, no COLLSCAN; indexes match decision 23 |
 
 ## Edge-case checklist
 

@@ -13,6 +13,8 @@ import { createAdminUsersRouter } from './routes/admin-users.routes.js';
 import { createAuthRouter } from './routes/auth.routes.js';
 import { createMeRouter } from './routes/me.routes.js';
 import { createNotesRouter } from './routes/notes.routes.js';
+import { createPostsRouter } from './routes/posts.routes.js';
+import { createUsersRouter } from './routes/users.routes.js';
 
 export function createApp() {
   const app = express();
@@ -46,7 +48,9 @@ export function createApp() {
 
   app.use('/api/auth', createAuthRouter());
   app.use('/api/users', createMeRouter());
+  app.use('/api/users', createUsersRouter());
   app.use('/api/notes', createNotesRouter());
+  app.use('/api/posts', createPostsRouter());
   app.use('/api/admin/notes', createAdminNotesRouter());
   app.use('/api/admin/users', createAdminUsersRouter());
 

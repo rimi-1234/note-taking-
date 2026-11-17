@@ -16,7 +16,8 @@
     "test": "vitest run",
     "sync-indexes": "tsx scripts/sync-indexes.ts",
     "seed": "tsx scripts/seed.ts",
-    "seed:demo": "tsx scripts/seed-demo.ts"
+    "seed:demo": "tsx scripts/seed-demo.ts",
+    "explain": "tsx scripts/explain.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
