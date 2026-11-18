@@ -16,7 +16,8 @@ export const logger = pino({
     ],
     censor: '[redacted]',
   },
-  ...(env.NODE_ENV === 'development' && {
+  // pino-pretty is a devDependency and is not installed on Vercel.
+  ...(env.NODE_ENV === 'development' && !process.env.VERCEL && {
     transport: { target: 'pino-pretty', options: { colorize: true, translateTime: 'SYS:HH:MM:ss' } },
   }),
 });

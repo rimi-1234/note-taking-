@@ -34,12 +34,11 @@ function loadEnv(): Env {
     const problems = parsed.error.issues
       .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
       .join('\n');
-    console.error(`Invalid environment configuration:\n${problems}`);
-    process.exit(1);
+    // Throw rather than exit so a serverless entry can report the problem instead of crashing.
+    throw new Error(`Invalid environment configuration:\n${problems}`);
   }
   if (parsed.data.JWT_ACCESS_SECRET === parsed.data.JWT_REFRESH_SECRET) {
-    console.error('Invalid environment configuration:\n  - JWT_REFRESH_SECRET must differ from JWT_ACCESS_SECRET');
-    process.exit(1);
+    throw new Error('Invalid environment configuration:\n  - JWT_REFRESH_SECRET must differ from JWT_ACCESS_SECRET');
   }
   return parsed.data;
 }
