@@ -1,4 +1,4 @@
-import { rateLimit } from 'express-rate-limit';
+import { ipKeyGenerator, rateLimit } from 'express-rate-limit';
 import { AppError } from '../lib/errors.js';
 
 const WINDOW_MS = 15 * 60 * 1000;
@@ -7,11 +7,19 @@ function limited(message: string) {
   return new AppError(429, 'RATE_LIMITED', message);
 }
 
-/** Per-IP login attempts (decision 18). Override with RATE_LIMIT_LOGIN_MAX for tests. */
+/**
+ * Login attempts per IP + email (decision 18). Keying on the email too stops one account's
+ * attempts from locking out everyone behind a shared IP (e.g. the frontend's API proxy).
+ * Override with RATE_LIMIT_LOGIN_MAX for tests.
+ */
 export function createLoginLimiter() {
   return rateLimit({
     windowMs: WINDOW_MS,
     limit: Number(process.env.RATE_LIMIT_LOGIN_MAX ?? 10),
+    keyGenerator: (req) => {
+      const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+      return `${ipKeyGenerator(req.ip ?? '')}:${email}`;
+    },
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     handler: (_req, _res, next) => {

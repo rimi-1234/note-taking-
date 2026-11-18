@@ -10,6 +10,7 @@ import {
 import { hashPassword } from '../lib/password.js';
 import { toPublicUser } from '../lib/user-public.js';
 import { authenticate } from '../middleware/authenticate.js';
+import { blockDemoAccounts } from '../middleware/demo-guard.js';
 import { requireRole } from '../middleware/require-role.js';
 import { validateBody, validateParams, validateQuery } from '../middleware/validate.js';
 import { Note, Post, User } from '../models/index.js';
@@ -83,7 +84,7 @@ export function createAdminUsersRouter() {
     }
   });
 
-  router.post('/', validateBody(createUserSchema), async (req, res, next) => {
+  router.post('/', blockDemoAccounts, validateBody(createUserSchema), async (req, res, next) => {
     try {
       const body = req.body as z.infer<typeof createUserSchema>;
       const user = await User.create({
@@ -114,6 +115,7 @@ export function createAdminUsersRouter() {
 
   router.patch(
     '/:id',
+    blockDemoAccounts,
     validateParams(userIdParams),
     validateBody(updateUserSchema),
     async (req, res, next) => {
@@ -160,7 +162,7 @@ export function createAdminUsersRouter() {
     },
   );
 
-  router.delete('/:id', validateParams(userIdParams), async (req, res, next) => {
+  router.delete('/:id', blockDemoAccounts, validateParams(userIdParams), async (req, res, next) => {
     try {
       const { id } = (req as typeof req & { validatedParams: z.infer<typeof userIdParams> })
         .validatedParams;

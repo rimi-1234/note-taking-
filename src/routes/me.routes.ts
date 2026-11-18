@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { clearRefreshCookie } from '../lib/cookies.js';
+import { isDemoAccount } from '../lib/demo.js';
 import { AppError } from '../lib/errors.js';
 import { hashPassword, verifyPassword } from '../lib/password.js';
 import { toPublicUser } from '../lib/user-public.js';
 import { authenticate } from '../middleware/authenticate.js';
+import { demoReadOnly } from '../middleware/demo-guard.js';
 import { validateBody } from '../middleware/validate.js';
 import { User } from '../models/index.js';
 
@@ -53,6 +55,9 @@ export function createMeRouter() {
   router.patch('/me', authenticate, validateBody(patchMeSchema), async (req, res, next) => {
     try {
       const body = req.body as z.infer<typeof patchMeSchema>;
+      if (body.newPassword !== undefined && isDemoAccount(req.user!.email)) {
+        throw demoReadOnly();
+      }
       const user = await User.findById(req.user!._id).select('+passwordHash');
       if (!user) {
         throw new AppError(401, 'UNAUTHENTICATED', 'User no longer exists');
