@@ -7,10 +7,11 @@ import {
   paginationQuerySchema,
   paginationSkip,
 } from '../lib/pagination.js';
+import { isDemoAccount } from '../lib/demo.js';
 import { hashPassword } from '../lib/password.js';
 import { toPublicUser } from '../lib/user-public.js';
 import { authenticate } from '../middleware/authenticate.js';
-import { blockDemoAccounts } from '../middleware/demo-guard.js';
+import { demoReadOnly } from '../middleware/demo-guard.js';
 import { requireRole } from '../middleware/require-role.js';
 import { validateBody, validateParams, validateQuery } from '../middleware/validate.js';
 import { Note, Post, User } from '../models/index.js';
@@ -84,7 +85,7 @@ export function createAdminUsersRouter() {
     }
   });
 
-  router.post('/', blockDemoAccounts, validateBody(createUserSchema), async (req, res, next) => {
+  router.post('/', validateBody(createUserSchema), async (req, res, next) => {
     try {
       const body = req.body as z.infer<typeof createUserSchema>;
       const user = await User.create({
@@ -115,7 +116,6 @@ export function createAdminUsersRouter() {
 
   router.patch(
     '/:id',
-    blockDemoAccounts,
     validateParams(userIdParams),
     validateBody(updateUserSchema),
     async (req, res, next) => {
@@ -135,6 +135,14 @@ export function createAdminUsersRouter() {
 
         if (isSelf && body.role !== undefined && body.role !== user.role) {
           throw new AppError(400, 'CANNOT_MODIFY_SELF', 'You cannot change your own role');
+        }
+
+        // The public demo logins must keep working for every visitor.
+        const changingLogin =
+          body.password !== undefined || (body.email !== undefined && body.email !== user.email);
+        const changingRole = body.role !== undefined && body.role !== user.role;
+        if (isDemoAccount(user.email) && (changingLogin || changingRole)) {
+          throw demoReadOnly();
         }
 
         if (body.name !== undefined) user.name = body.name;
@@ -162,7 +170,7 @@ export function createAdminUsersRouter() {
     },
   );
 
-  router.delete('/:id', blockDemoAccounts, validateParams(userIdParams), async (req, res, next) => {
+  router.delete('/:id', validateParams(userIdParams), async (req, res, next) => {
     try {
       const { id } = (req as typeof req & { validatedParams: z.infer<typeof userIdParams> })
         .validatedParams;
@@ -177,6 +185,7 @@ export function createAdminUsersRouter() {
       if (isSelf) {
         throw new AppError(400, 'CANNOT_MODIFY_SELF', 'You cannot delete your own account');
       }
+      if (isDemoAccount(user.email)) throw demoReadOnly();
 
       await user.deleteOne();
       await Promise.all([

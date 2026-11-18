@@ -23,24 +23,47 @@ const demoUsers = [
     role: 'user' as const,
     interests: ['chess', 'coding'],
   },
-  // One-click logins on the frontend; the backend keeps them read-only for account management.
+  // One-click login on the frontend; the backend stops its password and email from being changed.
   {
     name: 'Demo User',
     email: DEMO_USER_EMAIL,
     role: 'user' as const,
     interests: ['coding', 'music', 'travel'],
   },
-  {
-    name: 'Demo Admin',
-    email: DEMO_ADMIN_EMAIL,
-    role: 'admin' as const,
-    interests: ['security', 'reading'],
-  },
 ];
+
+const RETIRED_DEMO_EMAILS = ['demo-admin@example.com'];
 
 async function main() {
   await connectDb();
   const passwordHash = await hashPassword(DEMO_PASSWORD);
+
+  const retired = await User.find({ email: { $in: RETIRED_DEMO_EMAILS } }).select('_id');
+  const retiredIds = retired.map((u) => u._id);
+  await Promise.all([
+    User.deleteMany({ _id: { $in: retiredIds } }),
+    Note.deleteMany({ owner: { $in: retiredIds } }),
+    Post.deleteMany({ author: { $in: retiredIds } }),
+  ]);
+
+  // The single admin doubles as the demo admin; existing name, interests and content are kept.
+  const admin = await User.findOneAndUpdate(
+    { email: DEMO_ADMIN_EMAIL },
+    {
+      $set: { passwordHash, role: 'admin' },
+      $setOnInsert: { name: 'Admin', interests: ['security', 'reading'], tokenVersion: 0 },
+    },
+    { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
+  );
+  await Note.updateOne(
+    { owner: admin._id, title: 'Admin checklist' },
+    {
+      $setOnInsert: {
+        content: 'Review new users\nCheck the interests report\nSpot-check notes across owners',
+      },
+    },
+    { upsert: true },
+  );
 
   const users = [];
   for (const demo of demoUsers) {
@@ -77,11 +100,6 @@ async function main() {
     },
     { title: 'Weekend plan', content: 'Hike in the morning\nCoffee with friends\nFinish the side project', owner: users[3]!._id },
     { title: 'Trip checklist', content: 'Passport, charger, headphones, notebook', owner: users[3]!._id },
-    {
-      title: 'Admin checklist',
-      content: 'Review new users\nCheck the interests report\nSpot-check notes across owners',
-      owner: users[4]!._id,
-    },
   ]);
 
   await Post.insertMany([
@@ -91,15 +109,14 @@ async function main() {
     { title: 'Carol on coding', body: 'Notes on MongoDB indexes.', author: users[2]!._id },
     { title: 'Hello world', body: 'First post from the demo account. Posts are public to signed-in users.', author: users[3]!._id },
     { title: 'Favourite playlists', body: 'Lo-fi for focus, jazz for evenings.', author: users[3]!._id },
-    { title: 'Admin notes', body: 'Admins can view every note but never edit someone else’s.', author: users[4]!._id },
   ]);
 
   logger.info(
     {
+      admin: admin.email,
       users: users.map((u) => ({ email: u.email, interests: u.interests })),
       password: DEMO_PASSWORD,
-      notes: 8,
-      posts: 7,
+      removed: retiredIds.length,
     },
     'Demo seed complete (safe to rerun)',
   );
