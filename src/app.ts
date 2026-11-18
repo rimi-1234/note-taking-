@@ -1,7 +1,8 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
-import helmet from 'helmet';
+// Namespace import: Vercel's compiler resolves helmet's CJS typings, where the default import is not callable.
+import * as helmetModule from 'helmet';
 import mongoose from 'mongoose';
 import { pinoHttp } from 'pino-http';
 import { env } from './config/env.js';
@@ -23,7 +24,7 @@ export function createApp() {
   app.set('trust proxy', 1);
   app.disable('x-powered-by');
 
-  app.use(helmet());
+  app.use(helmetModule.default());
   app.use(
     cors({
       origin(origin, callback) {
