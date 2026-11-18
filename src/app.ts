@@ -1,7 +1,6 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express from 'express';
-// Namespace import: Vercel's compiler resolves helmet's CJS typings, where the default import is not callable.
+import express, { type RequestHandler } from 'express';
 import * as helmetModule from 'helmet';
 import mongoose from 'mongoose';
 import { pinoHttp } from 'pino-http';
@@ -17,6 +16,12 @@ import { createNotesRouter } from './routes/notes.routes.js';
 import { createPostsRouter } from './routes/posts.routes.js';
 import { createUsersRouter } from './routes/users.routes.js';
 
+// Vercel type-checks helmet against its CJS typings, where `default` is the module object rather than
+// the middleware factory; at runtime `default` is always the factory, so accept either shape.
+type HelmetFactory = () => RequestHandler;
+const helmetExport = helmetModule.default as unknown as HelmetFactory | { default: HelmetFactory };
+const helmet: HelmetFactory = typeof helmetExport === 'function' ? helmetExport : helmetExport.default;
+
 export function createApp() {
   const app = express();
 
@@ -24,7 +29,7 @@ export function createApp() {
   app.set('trust proxy', 1);
   app.disable('x-powered-by');
 
-  app.use(helmetModule.default());
+  app.use(helmet());
   app.use(
     cors({
       origin(origin, callback) {
